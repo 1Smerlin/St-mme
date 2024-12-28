@@ -1,51 +1,98 @@
+#
+# >>> >S Notic
+# > Pro Rohstoff Packet
+# Legende
+#  : Rohst. : p  : r  :  a  : l  : s  : pl
+# 1:  40    :
+# 2: 100    : 48 : 80 : 120 : 15 : 24 : 12
+# 3: 200    :
+# 4: 300    :
+
+# > Pro Rohstoff
+# Legende
+#  : Rohst. : p  : r  :  a  : l  : s  : pl
+# 1: 0.4  :
+# 2: 1    : 0.48 : 0.8 : 1.2 : 0.15 : 0.24 : 0.12
+# 3: 2    :
+# 4: 3    :
+
+# > Packet relati zu 1
+# Legende
+#  : Rohst. : p   :  r  :  a  : l    : s  : pl
+# 1: 100    : 120 : 200 : 300 : 37.5 : 60 : 30
+# 2: 250    :
+# 3: 500    :
+# 4: 750    :
+
+# > r.1 Pro Rohstoff
+# Legende
+#  : Rohst. : p   : r : a : l     : s   : pl
+# 1: 1      : 1.2 : 2 : 3 : 0.375 : 0.6 : 0.3
+# 2: 2.5    :
+# 3: 5      :
+# 4: 7.5    :
+
+# > Pro Mann
+# Legende
+#  : Raub. : p       :  r  : a      : l      : s      : pl
+# 1: 1     : 0.83... : 0.5 : 0.3... : 2.6... : 1.6... : 3.3...
+# 2: 2     :
+# 3: 3     :
+# 4: 4     :
+
+
+# > Größe
+#  : Rohst. : a : r : p   : s   : l     : pl
+# 1: 1      : 3 : 2 : 1.2 : 0.6 : 0.375 : 0.3
+
+# > Kosten
+#           :130:130: 90  : 950 : 475   : 80
+
+
+# >>> !>S Notic
+
+
+# >>> >S modul
 import pyautogui
 import time
+import numpy as np
+
+
+# >>> !>S modul
+# >>> >S variable
 
 trup = {
     "p": {
         "Spitz_name": "picke",
         "name": "Speerträger",
         "pro_Roh": 1.2,
-        "x": 4111,
-        "y": 330,
     },
     "r": {
         "Spitz_name": "Ritter",
         "name": "Schwertkämpfer",
         "pro_Roh": 2,
-        "x": 4202,
-        "y": 330,
     },
     "a": {
         "Spitz_name": "Axt",
         "name": "Axtkämpfer",
         "pro_Roh": 3,
-        "x": 4288,
-        "y": 330,
     },
     "l": {
         "Spitz_name": "leicht",
         "name": "leichte Kavallerie",
         "pro_Roh": 0.375,
-        "x": 4377,
-        "y": 330,
     },
     "s": {
         "Spitz_name": "schwer",
         "name": "schwere Kavallerie",
         "pro_Roh": 0.6,
-        "x": 4464,
-        "y": 330,
     },
     "pl": {
         "Spitz_name": "Paladin",
         "name": "Paladin",
         "pro_Roh": 0.3,
-        "x": 4557,
-        "y": 330,
     },
 }
-
 raub = {
     "1": {
         "sum": 0,
@@ -57,10 +104,6 @@ raub = {
             "l": 0,
             "s": 0,
             "pl": 0,
-        },
-        "button": {
-            "x": 4137,
-            "y": 852,
         },
     },
     "2": {
@@ -74,10 +117,6 @@ raub = {
             "s": 0,
             "pl": 0,
         },
-        "button": {
-            "x": 4390,
-            "y": 852,
-        },
     },
     "3": {
         "sum": 0,
@@ -89,10 +128,6 @@ raub = {
             "l": 0,
             "s": 0,
             "pl": 0,
-        },
-        "button": {
-            "x": 4651,
-            "y": 852,
         },
     },
     "4": {
@@ -106,18 +141,109 @@ raub = {
             "s": 0,
             "pl": 0,
         },
-        "button": {
-            "x": 4898,
-            "y": 852,
-        },
     },
 }
+
+
+resurce_time = {
+    100: {"h": 0, "m": 52, "s": 27},
+    200: {"h": 1, "m": 11, "s": 54},
+    300: {"h": 1, "m": 30, "s": 21},
+    400: {"h": 1, "m": 48, "s": 11},
+    500: {"h": 2, "m": 5, "s": 34},
+    600: {"h": 2, "m": 22, "s": 37},
+    700: {"h": 2, "m": 39, "s": 22},
+    800: {"h": 2, "m": 55, "s": 54},
+    900: {"h": 3, "m": 12, "s": 13},
+    1000: {"h": 3, "m": 28, "s": 21},
+    1100: {"h": 3, "m": 44, "s": 19},
+    1500: {"h": 4, "m": 46, "s": 53},
+    5000: {"h": 13, "m": 9, "s": 9},
+    8000: {"h": 19, "m": 48, "s": 53},
+    10000: {"h": 24, "m": 6, "s": 38},
+    15000: {"h": 34, "m": 30, "s": 31},
+}
+
+
+# >>> !>S variable
+# >>> >S Functions
+
+
+# >>> >S logik
 
 
 # >> Time
 def convert_s(zeit_obj):
     seconds = zeit_obj["h"] * 3600 + zeit_obj["m"] * 60 + zeit_obj["s"]
     return seconds
+
+
+# >>> !>S logik
+
+
+# >> Read Time Function
+def read_s(stoff_menge):
+    zeit_obj = resurce_time[stoff_menge]
+    seconds = convert_s(zeit_obj)
+    return seconds
+
+
+def read_func(resurce_time):
+    rohstoffe = np.array([stoff_key for stoff_key in resurce_time])  # Rohstoffmengen
+
+    zeiten = np.array([read_s(stoff_key) for stoff_key in resurce_time])
+
+    # Polynomiale Regression 2. Grades (quadratische Funktion)
+    koeffizienten = np.polyfit(rohstoffe, zeiten, 10)  # a, b, c für ax^2 + bx + c
+    funktion = np.poly1d(koeffizienten)
+    return funktion
+
+
+funktion = read_func(resurce_time)
+
+
+def time_for_resurce(rohstoffe, funktion):
+    sekunden = funktion(rohstoffe)
+    h = int(sekunden // 3600)
+    m = int((sekunden % 3600) // 60)
+    s = int(sekunden % 60)
+    return {"h": h, "m": m, "s": s}
+
+
+def print_time(stoff_menge):
+    zeit_test = time_for_resurce(stoff_menge, funktion)
+
+    def time_in_string(time_dic):
+        return f"{time_dic['h']} Stunden, {time_dic['m']} Minuten, {time_dic['s']} Sekunden"
+
+    new_time_string = time_in_string(zeit_test)
+
+    print(f"{stoff_menge} Rohstoffe:")
+    print(f"new_time: {new_time_string}")
+    if stoff_menge in resurce_time:
+        new_time = convert_s(zeit_test)
+        old_time = read_s(stoff_menge)
+        old_time_string = time_in_string(resurce_time[stoff_menge])
+        if new_time > old_time:
+            deferent = new_time - old_time
+            print(f"new_time ist {deferent} Größer")
+            print(f"old_time: {old_time_string}")
+        elif new_time < old_time:
+            deferent = old_time - new_time
+            print(f"old_time ist {deferent} Größer")
+            print(f"old_time: {old_time_string}")
+        else:
+            print(f"old_time: {old_time_string}")
+            print(f"new_time und old_time sind gleich Größ")
+
+
+def resurce_h(stoff_menge):
+    seconds = read_s(stoff_menge)
+    pro_stoff = stoff_menge / seconds * 3600
+    print(f"Bei {stoff_menge} ist umsatz {pro_stoff} pro Stunde")
+
+
+# >> Use Time Function
 
 
 # >> Raub
@@ -159,13 +285,6 @@ def all_roh():
     return (p / trup["p"]["pro_Roh"]) + (r / trup["r"]["pro_Roh"]) + (a / trup["a"]["pro_Roh"]) + (l / trup["l"]["pro_Roh"]) + (s / trup["s"]["pro_Roh"]) + (pl / trup["pl"]["pro_Roh"])
 
 
-# > Größe
-#  : Rohst. : a : r : p   : s   : l     : pl
-# 1: 1      : 3 : 2 : 1.2 : 0.6 : 0.375 : 0.3
-# Kosten
-#           :130:130: 90  : 950 : 475   : 80
-
-
 def add_trup(p, r, a, l, s, pl):
     all_trup = {"p": p, "r": r, "a": a, "l": l, "s": s, "pl": pl}
     trup_series = ["pl", "l", "s", "p", "r", "a"]
@@ -181,37 +300,30 @@ def add_trup(p, r, a, l, s, pl):
 
 def print_resurce(more=None):
     gesammt = 0
+    big_resurce = 0
     for raub_key in raub:
         resurce = raub[raub_key]["sum"]
         print("Raub: ", raub_key)
         print("sum: ", resurce)
         gesammt += resurce
+        if big_resurce < resurce:
+            big_resurce = resurce
         print("gesammt: ", gesammt)
         if more:
             for trup_key in raub[raub_key]["trup"]:
                 print(f"{trup_key}: ", raub[raub_key]["trup"][trup_key])
+    new_time = time_for_resurce(big_resurce, funktion)
+    print(f"Time: ", new_time)
+    print(f"Time Second: ", convert_s(new_time))
     print(f"Gesammt Summe: ", gesammt)
-    print(f"Time: ", t)
-    print(f"Time Second: ", convert_s(t))
-    print(f"pro Stunde: ", gesammt / convert_s(t) * 3600)
+    print(f"pro Stunde: ", gesammt / convert_s(new_time) * 3600)
+    print(f"Biggest Summe: ", big_resurce)
+    print(f"Biggest pro Stunde: ", big_resurce / convert_s(new_time) * 3600)
 
 
-# >> Truppen anzahl
-p = 239
-r = 175
-a = 0
-l = 164
-s = 0
-pl = 1
-t = {"h": 1, "m": 49, "s": 20}
+# >>> !>S Functions
 
-add_trup(p, r, a, l, s, pl)
-
-# print_resurce("t")
-print_resurce()
-
-
-# >>> Bot
+# >>> >S Bot
 
 
 def klick_und_eingabe(x, y, zahl):
@@ -226,18 +338,257 @@ def klick_und_eingabe(x, y, zahl):
     pyautogui.typewrite(str(zahl), interval=0.1)  # Optional: interval für Tippen-Verzögerung
 
 
-def send_trup(raub_key):
-    pyautogui.moveTo(raub[raub_key]["button"]["x"], raub[raub_key]["button"]["y"], duration=0.5)  # Optional: duration für sanfte Bewegung
+def click_to(x, y):
+    pyautogui.moveTo(x, y, duration=0.5)
     pyautogui.click()
 
 
-def send_all_trup():
+def send_all_trup(coordinat):
     for raub_key in raub:
         for trup_key in raub[raub_key]["trup"]:
             if raub[raub_key]["trup"][trup_key] > 0:
-                klick_und_eingabe(trup[trup_key]["x"], trup[trup_key]["y"], raub[raub_key]["trup"][trup_key])
+                klick_und_eingabe(coordinat["trup"][trup_key]["x"], coordinat["trup"][trup_key]["y"], raub[raub_key]["trup"][trup_key])
 
-        send_trup(raub_key)
+        click_to(coordinat["raub"][raub_key]["x"], coordinat["raub"][raub_key]["y"])
 
 
-send_all_trup()
+# >>> !>S Bot
+# >>> >S main
+
+
+# >> coordinat
+coordinat = {
+    "3_bild": {
+        "trup": {
+            "p": {
+                "x": 4111,
+                "y": 330,
+            },
+            "r": {
+                "x": 4202,
+                "y": 330,
+            },
+            "a": {
+                "x": 4288,
+                "y": 330,
+            },
+            "l": {
+                "x": 4377,
+                "y": 330,
+            },
+            "s": {
+                "x": 4464,
+                "y": 330,
+            },
+            "pl": {
+                "x": 4557,
+                "y": 330,
+            },
+        },
+        "raub": {
+            "1": {
+                "x": 4137,
+                "y": 852,
+            },
+            "2": {
+                "x": 4390,
+                "y": 852,
+            },
+            "3": {
+                "x": 4651,
+                "y": 852,
+            },
+            "4": {
+                "x": 4898,
+                "y": 852,
+            },
+        },
+    },
+    "vorlage": {
+        "trup": {
+            "p": {
+                "x": 0,
+                "y": 0,
+            },
+            # x 86
+            "r": {
+                "x": 0 + 86,
+                "y": 0,
+            },
+            # x 91
+            "a": {
+                "x": 0 + 86 + 91,
+                "y": 0,
+            },
+            # x 89
+            "l": {
+                "x": 0 + 86 + 91 + 89,
+                "y": 0,
+            },
+            # x 88
+            "s": {
+                "x": 0 + 86 + 91 + 89 + 88,
+                "y": 0,
+            },
+            # x 87
+            "pl": {
+                "x": 0 + 86 + 91 + 89 + 88 + 87,
+                "y": 0,
+            },
+        },
+        # x 27
+        # y 520
+        "raub": {
+            "1": {
+                "x": 27,
+                "y": 520,
+            },
+            # x 248
+            "2": {
+                "x": 27 + 248,
+                "y": 520,
+            },
+            # x 263
+            "3": {
+                "x": 27 + 248 + 263,
+                "y": 520,
+            },
+            # x 250
+            "4": {
+                "x": 27 + 248 + 263 + 250,
+                "y": 520,
+            },
+        },
+    },
+    "2_bild": {
+        "trup": {
+            "p": {
+                "x": 2431,
+                "y": 360,
+            },
+            "r": {
+                "x": 2517,
+                "y": 360,
+            },
+            "a": {
+                "x": 2608,
+                "y": 360,
+            },
+            "l": {
+                "x": 2697,
+                "y": 360,
+            },
+            "s": {
+                "x": 2785,
+                "y": 360,
+            },
+            "pl": {
+                "x": 2872,
+                "y": 360,
+            },
+        },
+        "raub": {
+            "1": {
+                "x": 2458,
+                "y": 880,
+            },
+            "2": {
+                "x": 2706,
+                "y": 880,
+            },
+            "3": {
+                "x": 2969,
+                "y": 880,
+            },
+            "4": {
+                "x": 3219,
+                "y": 880,
+            },
+        },
+    },
+}
+
+
+def create_coord(coordinat, x_offset, y_offset):
+    import copy
+
+    # Create a deep copy of the original coordinates
+    updated_coord = copy.deepcopy(coordinat)
+
+    # Function to recursively update coordinates
+    def update(obj):
+        for key, value in obj.items():
+            if isinstance(value, dict):
+                if "x" in value and "y" in value:
+                    value["x"] += x_offset
+                    value["y"] += y_offset
+                else:
+                    update(value)
+
+    update(updated_coord)
+
+    return updated_coord
+
+
+# Offsets
+anpass_coord = {
+    "3_bild": {"x": 4347, "y": 354},
+    "1_bild": {"x": 1056, "y": 336},
+}
+# pass_coord = anpass_coord["1_bild"]
+pass_coord = anpass_coord["3_bild"]
+
+# Neue Koordinaten erzeugen
+new_coords = create_coord(coordinat["vorlage"], pass_coord["x"], pass_coord["y"])
+# new_coords = coordinat["2_bild"]
+
+
+# >> Truppen anzahl
+p = 802
+r = 473
+a = 0
+l = 531
+s = 0
+pl = 1
+add_trup(p, r, a, l, s, pl)
+
+print_resurce("t")
+
+
+send_all_trup(new_coords)
+
+# !!! Time test
+
+
+# print_time(100)
+# print_time(200)
+# print_time(300)
+# print_time(400)
+# print_time(500)
+# print_time(600)
+# print_time(700)
+# print_time(800)
+# print_time(900)
+# print_time(1000)
+# print_time(1100)
+# print_time(8000)
+# print_time(1500)
+# print_time(15000)
+
+
+# resurce_h(100)
+# resurce_h(200)
+# resurce_h(300)
+# resurce_h(400)
+# resurce_h(500)
+# resurce_h(600)
+# resurce_h(700)
+# resurce_h(800)
+# resurce_h(900)
+# resurce_h(1000)
+# resurce_h(1100)
+# resurce_h(1500)
+# resurce_h(15000)
+
+
+# >>> !>S main
