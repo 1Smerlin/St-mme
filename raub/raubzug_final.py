@@ -55,8 +55,11 @@
 # >>> >S modul
 import pyautogui
 import time
+import json
 import numpy as np
-
+import multiprocessing
+import time
+import keyboard
 
 # >>> !>S modul
 # >>> >S variable
@@ -356,54 +359,8 @@ def send_all_trup(coordinat):
 # >>> >S main
 
 
-# >> coordinat
+# >> 1 coordinat
 coordinat = {
-    "3_bild": {
-        "trup": {
-            "p": {
-                "x": 4111,
-                "y": 330,
-            },
-            "r": {
-                "x": 4202,
-                "y": 330,
-            },
-            "a": {
-                "x": 4288,
-                "y": 330,
-            },
-            "l": {
-                "x": 4377,
-                "y": 330,
-            },
-            "s": {
-                "x": 4464,
-                "y": 330,
-            },
-            "pl": {
-                "x": 4557,
-                "y": 330,
-            },
-        },
-        "raub": {
-            "1": {
-                "x": 4137,
-                "y": 852,
-            },
-            "2": {
-                "x": 4390,
-                "y": 852,
-            },
-            "3": {
-                "x": 4651,
-                "y": 852,
-            },
-            "4": {
-                "x": 4898,
-                "y": 852,
-            },
-        },
-    },
     "vorlage": {
         "trup": {
             "p": {
@@ -460,49 +417,59 @@ coordinat = {
             },
         },
     },
-    "2_bild": {
+    "vor_2": {
         "trup": {
             "p": {
-                "x": 2431,
-                "y": 360,
+                "x": 0,
+                "y": 0,
             },
+            # x 86
             "r": {
-                "x": 2517,
-                "y": 360,
+                "x": 0 + 86,
+                "y": 0,
             },
+            # x 91
             "a": {
-                "x": 2608,
-                "y": 360,
+                "x": 0 + 86 + 91,
+                "y": 0,
             },
+            # x 89
             "l": {
-                "x": 2697,
-                "y": 360,
+                "x": 0 + 86 + 91 + 89,
+                "y": 0,
             },
+            # x 88
             "s": {
-                "x": 2785,
-                "y": 360,
+                "x": 0 + 86 + 91 + 89 + 88,
+                "y": 0,
             },
+            # x 87
             "pl": {
-                "x": 2872,
-                "y": 360,
+                "x": 0 + 86 + 91 + 89 + 88 + 87,
+                "y": 0,
             },
         },
+        # x 27
+        # y 520
         "raub": {
             "1": {
-                "x": 2458,
-                "y": 880,
+                "x": 27,
+                "y": 520,
             },
+            # x 248
             "2": {
-                "x": 2706,
-                "y": 880,
+                "x": 27 + 248,
+                "y": 520,
             },
+            # x 263
             "3": {
-                "x": 2969,
-                "y": 880,
+                "x": 27 + 248 + 263,
+                "y": 520,
             },
+            # x 250
             "4": {
-                "x": 3219,
-                "y": 880,
+                "x": 27 + 248 + 263 + 250,
+                "y": 520,
             },
         },
     },
@@ -534,20 +501,33 @@ def create_coord(coordinat, x_offset, y_offset):
 anpass_coord = {
     "3_bild": {"x": 4347, "y": 354},
     "1_bild": {"x": 1056, "y": 336},
+    "x_bild": {"x": 1046, "y": 418},
 }
-# pass_coord = anpass_coord["1_bild"]
-pass_coord = anpass_coord["3_bild"]
+# pass_coord = anpass_coord["x_bild"]
+# new_coords = create_coord(coordinat["vorlage"], pass_coord["x"], pass_coord["y"])
+
 
 # Neue Koordinaten erzeugen
-new_coords = create_coord(coordinat["vorlage"], pass_coord["x"], pass_coord["y"])
-# new_coords = coordinat["2_bild"]
+def load_coordinates_from_file(filename="position.json"):
+    try:
+        with open(filename, "r") as file:
+            new_coords = json.load(file)
+            print("Koordinaten erfolgreich geladen.")
+            return new_coords
+    except FileNotFoundError:
+        print(f"Die Datei {filename} wurde nicht gefunden.")
+        return {}
 
+
+vorlagen_coords = load_coordinates_from_file()
+new_coords = vorlagen_coords["1_bild"]
+# new_coords = vorlagen_coords["3_bild"]
 
 # >> Truppen anzahl
-p = 802
-r = 473
+p = 598
+r = 48
 a = 0
-l = 531
+l = 672
 s = 0
 pl = 1
 add_trup(p, r, a, l, s, pl)
@@ -555,7 +535,39 @@ add_trup(p, r, a, l, s, pl)
 print_resurce("t")
 
 
-send_all_trup(new_coords)
+# !!! Thread Test
+
+
+def ESC_break(func, *args):
+    """
+    Führt eine Funktion in einem separaten Prozess aus und beendet den Prozess,
+    wenn die ESC-Taste gedrückt wird.
+
+    Parameters:
+        func: Die auszuführende Funktion.
+        *args: Argumente für die Funktion.
+    """
+    if __name__ == "__main__":
+        # Prozess erstellen und starten
+        process = multiprocessing.Process(target=func, args=args)
+        process.start()
+
+        print("Drücke ESC, um den Prozess zu beenden.")
+        while process.is_alive():
+            if keyboard.is_pressed("esc"):
+                print("ESC wurde gedrückt. Beende den Prozess...")
+                process.terminate()  # Prozess beenden
+                process.join()  # Warten, bis der Prozess beendet ist
+                break
+
+        print("Prozess erfolgreich beendet.")
+
+
+ESC_break(send_all_trup, new_coords)
+
+
+# send_all_trup(new_coords)
+
 
 # !!! Time test
 
